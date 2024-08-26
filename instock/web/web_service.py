@@ -26,6 +26,7 @@ import instock.lib.database as mdb
 import instock.lib.version as version
 import instock.web.dataTableHandler as dataTableHandler
 import instock.web.dataIndicatorsHandler as dataIndicatorsHandler
+import instock.web.dataStatisticsHander as dataStatisticsHander
 import instock.web.base as webBase
 
 __author__ = 'myh '
@@ -41,6 +42,8 @@ class Application(tornado.web.Application):
             # 使用datatable 展示报表数据模块。
             (r"/instock/api_data", dataTableHandler.GetStockDataHandler),
             (r"/instock/data", dataTableHandler.GetStockHtmlHandler),
+            ## 获得统计数据 
+            (r"/instock/statistics_data", dataStatisticsHander.GetDataStatisticsHandler),
             # 获得股票指标数据。
             (r"/instock/data/indicators", dataIndicatorsHandler.GetDataIndicatorsHandler),
             # 加入关注

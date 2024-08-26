@@ -18,7 +18,7 @@ from instock.core.strategy import high_tight_flag
 __author__ = 'myh '
 __date__ = '2023/3/10 '
 
-RATE_FIELDS_COUNT = 100  # N日收益率字段数目，即N值
+RATE_FIELDS_COUNT = 7  # N日收益率字段数目，即N值
 
 TABLE_CN_STOCK_ATTENTION = {'name': 'cn_stock_attention', 'cn': '我的关注',
                             'columns': {'datetime': {'type': DATETIME, 'cn': '日期', 'size': 0},
@@ -273,7 +273,14 @@ TABLE_CN_STOCK_FOREIGN_KEY = {'name': 'cn_stock_foreign_key', 'cn': '股票外�
 
 TABLE_CN_STOCK_BACKTEST_DATA = {'name': 'cn_stock_backtest_data', 'cn': '股票回归测试数据',
                                 'columns': {'rate_%s' % i: {'type': FLOAT, 'cn': '%s日收益率' % i, 'size': 100} for i in
-                                            range(1, RATE_FIELDS_COUNT + 1, 1)}}
+                                            range(1, RATE_FIELDS_COUNT + 1, 1)},
+                                            ##'change_rate': {'type': FLOAT, 'cn': '涨跌幅', 'size': 70,'map': 'CHANGE_RATE'},  ## 调整
+                                            }
+TABLE_CN_STOCK_BACKTEST_DATA['columns'].update({'one_day_open_change_rate': {'type': FLOAT, 'cn': '当天战法-1日开盘涨跌幅', 'size': 70,'map': 'CHANGE_RATE'},
+                                                'two_day_open_change_rate': {'type': FLOAT, 'cn': '当天战法-2日开盘涨跌幅', 'size': 70,'map': 'CHANGE_RATE'},
+                                                'getian_one_day_open_change_rate': {'type': FLOAT, 'cn': '隔天战法-1日开盘涨跌幅', 'size': 70,'map': 'CHANGE_RATE'},
+                                                'getian_two_day_open_change_rate': {'type': FLOAT, 'cn': '隔天战法-2日开盘涨跌幅', 'size': 70,'map': 'CHANGE_RATE'},})
+
 
 STOCK_STATS_DATA = {'name': 'calculate_indicator', 'cn': '股票统计/指标计算助手库',
                     'columns': {'close': {'type': FLOAT, 'cn': '价格', 'size': 0},
@@ -355,8 +362,51 @@ TABLE_CN_STOCK_INDICATORS = {'name': 'cn_stock_indicators', 'cn': '股票指标�
                              'columns': TABLE_CN_STOCK_FOREIGN_KEY['columns'].copy()}
 TABLE_CN_STOCK_INDICATORS['columns'].update(STOCK_STATS_DATA['columns'])
 
+
+##新需求
 _tmp_columns = TABLE_CN_STOCK_FOREIGN_KEY['columns'].copy()
+_tmp_columns.update({'change_rate': {'type': FLOAT, 'cn': '0日涨跌幅', 'size': 70,'map': 'CHANGE_RATE'},
+                     'change_rate_norm': {'type': FLOAT, 'cn': '归一 0日涨跌幅', 'size': 70,'map': 'CHANGE_RATE_NORM'},})
 _tmp_columns.update(TABLE_CN_STOCK_BACKTEST_DATA['columns'])
+_tmp_columns.update({'industry': {'type': NVARCHAR(length=20), 'cn': '行业', 'size': 100,'map': 'INDUSTRY'},
+                     'popularity_rank': {'type': SmallInteger, 'cn': '股吧人气排名', 'size': 70,'map': 'POPULARITY_RANK'},
+                     'industry_num': {'type': SmallInteger, 'cn': '单个行业股票放量数量', 'size': 70,'map': 'INDUSTRY_NUM'},
+                     'style': {'type': NVARCHAR(length=255), 'cn': '板块', 'size': 150,'map': 'STYLE'},
+                     'concept': {'type': NVARCHAR(length=255), 'cn': '概念', 'size': 150,'map': 'CONCEPT'},
+                     'volume_ratio': {'type': FLOAT, 'cn': '量比', 'size': 70,'map': 'VOLUME_RATIO'},
+                     'turnoverrate': {'type': FLOAT, 'cn': '换手率', 'size': 70,'map': 'TURNOVERRATE'},
+                     'total_market_cap': {'type': BIGINT, 'cn': '总市值', 'size': 120, 'map': 'TOTAL_MARKET_CAP'},
+                     'holder_newest': {'type': BIGINT, 'cn': '最新股东户数', 'size': 80,'map': 'HOLDER_NEWEST'},
+                     'holder_ratio': {'type': FLOAT, 'cn': '股东户数增长率', 'size': 70,'map': 'HOLDER_RATIO'},
+                     'allcorp_num': {'type': SmallInteger, 'cn': '机构持股家数合计', 'size': 70,'map': 'ALLCORP_NUM'},
+                     'allcorp_fund_num': {'type': SmallInteger, 'cn': '基金持股家数', 'size': 70,'map': 'ALLCORP_FUND_NUM'},
+                     'rank_change': {'type': SmallInteger, 'cn': '人气排名变化', 'size': 70,'map': 'RANK_CHANGE'},
+                     'concern_rank_7days': {'type': SmallInteger, 'cn': '7日关注排名', 'size': 70,'map': 'CONCERN_RANK_7DAYS'},
+                     'changerate_ty': {'type': FLOAT, 'cn': '今年以来涨跌幅', 'size': 70,'map': 'CHANGERATE_TY'},
+                     })
+
+_tmp_columns_static = {
+    'date': {'type': DATE, 'cn': '日期', 'size': 0},
+    'NegativeCount': {'type': SmallInteger, 'cn': '亏钱股票数量', 'size': 70,'map': 'NegativeCount'},
+    'PositiveCount': {'type': SmallInteger, 'cn': '赚钱股票数量', 'size': 70,'map': 'PositiveCount'},
+    'PosNegCount': {'type': SmallInteger, 'cn': '放量股票数量', 'size': 70,'map': 'PosNegCount'},
+    'PosNegRate': {'type': FLOAT, 'cn': '赚亏股票数量比', 'size': 70,'map': 'PosNegRate'},
+    'ConceptStatistics': {'type': NVARCHAR(length=21000), 'cn': '概念统计', 'size': 150,'map': 'ConceptStatistics'},
+    'strategy1_percent': {'type': FLOAT, 'cn': 's1收益率', 'size': 70,'map': 'strategy1_percent'},
+    'strategy1_money': {'type': BIGINT, 'cn': 's1收益', 'size': 70,'map': 'strategy1_money'},
+    'strategy2_percent': {'type': FLOAT, 'cn': 's2收益率', 'size': 70,'map': 'strategy2_percent'},
+    'strategy2_money': {'type': BIGINT, 'cn': 's2收益率', 'size': 70,'map': 'strategy2_money'},
+    'strategy3_percent': {'type': FLOAT, 'cn': 's3收益率', 'size': 70,'map': 'strategy3_percent'},
+    'strategy3_money': {'type': BIGINT, 'cn': 's3收益率', 'size': 70,'map': 'strategy3_money'},
+
+    ##strategy1:"按照日涨跌幅降序排列取前五名"
+            ##strategy2:"按照股吧人气排名降序排列取前五名"
+}
+TABLE_CN_STOCK_STRATEGIES_STATIC = {'name': 'cn_stock_strategy_enter_static', 'cn': '放量上涨数据统计', 'size': 70, 'func': enter.check_volume,
+     'columns': _tmp_columns_static}
+
+
+
 
 TABLE_CN_STOCK_INDICATORS_BUY = {'name': 'cn_stock_indicators_buy', 'cn': '股票指标买入',
                                  'columns': _tmp_columns}
@@ -367,28 +417,29 @@ TABLE_CN_STOCK_INDICATORS_SELL = {'name': 'cn_stock_indicators_sell', 'cn': '股
 TABLE_CN_STOCK_STRATEGIES = [
     {'name': 'cn_stock_strategy_enter', 'cn': '放量上涨', 'size': 70, 'func': enter.check_volume,
      'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_keep_increasing', 'cn': '均线多头', 'size': 70, 'func': keep_increasing.check,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_parking_apron', 'cn': '停机坪', 'size': 70, 'func': parking_apron.check,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_backtrace_ma250', 'cn': '回踩年线', 'size': 70, 'func': backtrace_ma250.check,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_breakthrough_platform', 'cn': '突破平台', 'size': 70,
-     'func': breakthrough_platform.check,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_low_backtrace_increase', 'cn': '无大幅回撤', 'size': 70,
-     'func': low_backtrace_increase.check,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_turtle_trade', 'cn': '海龟交易法则', 'size': 70, 'func': turtle_trade.check_enter,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_high_tight_flag', 'cn': '高而窄的旗形', 'size': 70,
-     'func': high_tight_flag.check_high_tight,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_climax_limitdown', 'cn': '放量跌停', 'size': 70, 'func': climax_limitdown.check,
-     'columns': _tmp_columns},
-    {'name': 'cn_stock_strategy_low_atr', 'cn': '低ATR成长', 'size': 70, 'func': low_atr.check_low_increase,
-     'columns': _tmp_columns}
+    # {'name': 'cn_stock_strategy_keep_increasing', 'cn': '均线多头', 'size': 70, 'func': keep_increasing.check,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_parking_apron', 'cn': '停机坪', 'size': 70, 'func': parking_apron.check,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_backtrace_ma250', 'cn': '回踩年线', 'size': 70, 'func': backtrace_ma250.check,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_breakthrough_platform', 'cn': '突破平台', 'size': 70,
+    #  'func': breakthrough_platform.check,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_low_backtrace_increase', 'cn': '无大幅回撤', 'size': 70,
+    #  'func': low_backtrace_increase.check,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_turtle_trade', 'cn': '海龟交易法则', 'size': 70, 'func': turtle_trade.check_enter,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_high_tight_flag', 'cn': '高而窄的旗形', 'size': 70,
+    #  'func': high_tight_flag.check_high_tight,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_climax_limitdown', 'cn': '放量跌停', 'size': 70, 'func': climax_limitdown.check,
+    #  'columns': _tmp_columns},
+    # {'name': 'cn_stock_strategy_low_atr', 'cn': '低ATR成长', 'size': 70, 'func': low_atr.check_low_increase,
+    #  'columns': _tmp_columns}
 ]
+
 
 STOCK_KLINE_PATTERN_DATA = {'name': 'cn_stock_pattern_recognitions', 'cn': 'K线形态',
                             'columns': {

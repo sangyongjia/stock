@@ -20,7 +20,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', filename=os.path.join(log_
 logging.getLogger().setLevel(logging.INFO)
 import init_job as bj
 import basic_data_daily_job as hdj
-import basic_data_other_daily_job as hdtj
+import basic_data_other_daily_job as hdtj 
 import basic_data_after_close_daily_job as acdj
 import indicators_data_daily_job as gdj
 import strategy_data_daily_job as sdj
@@ -38,11 +38,17 @@ def main():
     logging.info("######## 任务执行时间: %s #######" % _start.strftime("%Y-%m-%d %H:%M:%S.%f"))
     # 第1步创建数据库
     bj.main()
+    _start = datetime.datetime.now()
+    logging.info("########第1步创建数据库完成时间: %s #######" % _start.strftime("%Y-%m-%d %H:%M:%S.%f"))
     # 第2.1步创建股票基础数据表
     hdj.main()
+    _start = datetime.datetime.now()
+    logging.info("########第2.1步创建股票基础数据表完成时间: %s #######" % _start.strftime("%Y-%m-%d %H:%M:%S.%f"))
     # 第2.2步创建综合股票数据表
     sddj.main()
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    _start = datetime.datetime.now()
+    logging.info("########第2.2步创建综合股票数据表完成时间: %s #######" % _start.strftime("%Y-%m-%d %H:%M:%S.%f"))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:  ##add max_workers=1 for debug
         # # 第3.1步创建股票其它基础数据表
         executor.submit(hdtj.main)
         # # 第3.2步创建股票指标数据表
@@ -52,9 +58,12 @@ def main():
         # # # # 第5步创建股票策略数据表
         executor.submit(sdj.main)
 
+    _start = datetime.datetime.now()
+    logging.info("########第3，4，5步创建综合股票数据表完成时间: %s #######" % _start.strftime("%Y-%m-%d %H:%M:%S.%f"))
     # # # # 第6步创建股票回测
     bdj.main()
-
+    _start = datetime.datetime.now()
+    logging.info("########第6步创建股票回测完成时间: %s #######" % _start.strftime("%Y-%m-%d %H:%M:%S.%f"))
     # # # # 第7步创建股票闭盘后才有的数据
     acdj.main()
 

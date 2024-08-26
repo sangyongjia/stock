@@ -23,7 +23,7 @@ def run_with_args(run_fun, *args):
         end_date = datetime.datetime(int(tmp_year), int(tmp_month), int(tmp_day)).date()
         run_date = start_date
         try:
-            with concurrent.futures.ThreadPoolExecutor() as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:  ##add max_workers=1
                 while run_date <= end_date:
                     if trd.is_trade_date(run_date):
                         executor.submit(run_fun, run_date, *args)

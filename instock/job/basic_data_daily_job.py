@@ -24,7 +24,7 @@ def save_nph_stock_spot_data(date, before=True):
         return
     # 股票列表
     try:
-        data = stock_data(date).get_data()
+        data = stock_data(date).get_data() ## 爬虫获取数据
         if data is None or len(data.index) == 0:
             return
 
@@ -44,10 +44,10 @@ def save_nph_stock_spot_data(date, before=True):
 
 
 # 基金实时行情数据。
-def save_nph_etf_spot_data(date, before=True):
+def save_nph_etf_spot_data(date, before=True): ## nph的含义是什么？
     if before:
         return
-    # 股票列表
+    # 基金列表
     try:
         data = stf.fetch_etfs(date)
         if data is None or len(data.index) == 0:

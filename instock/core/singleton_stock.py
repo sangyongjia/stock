@@ -26,14 +26,15 @@ class stock_data(metaclass=singleton_type):
 
 # 读取股票历史数据
 class stock_hist_data(metaclass=singleton_type):
-    def __init__(self, date=None, stocks=None, workers=16):
+    def __init__(self, date=None, stocks=None, workers=16):  ##workers=16 => workers=1
         if stocks is None:
-            _subset = stock_data(date).get_data()[list(tbs.TABLE_CN_STOCK_FOREIGN_KEY['columns'])]
+            _subset = stock_data(date).get_data()[list(tbs.TABLE_CN_STOCK_FOREIGN_KEY['columns'])]  ##获取当天的股票数据
             stocks = [tuple(x) for x in _subset.values]
         if stocks is None:
             self.data = None
             return
-        date_start, is_cache = trd.get_trade_hist_interval(stocks[0][0])  # 提高运行效率，只运行一次
+        ##当前时间往前推3年
+        date_start, is_cache = trd.get_trade_hist_interval(stocks[0][0])  # 提高运行效率，只运行一次。
         _data = {}
         try:
             # max_workers是None还是没有给出，将默认为机器cup个数*5

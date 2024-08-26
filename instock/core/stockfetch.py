@@ -70,7 +70,7 @@ def fetch_stocks_trade_date():
     return None
 
 
-# 读取当天股票数据
+# 读取当天etf数据
 def fetch_etfs(date):
     try:
         data = fee.fund_etf_spot_em()
@@ -81,7 +81,7 @@ def fetch_etfs(date):
         else:
             data.insert(0, 'date', date.strftime("%Y-%m-%d"))
         data.columns = list(tbs.TABLE_CN_ETF_SPOT['columns'])
-        data = data.loc[data['new_price'].apply(is_open)]
+        data = data.loc[data['new_price'].apply(is_open)]    ##类股票部分的数据过滤
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_etfs处理异常：{e}")
@@ -95,11 +95,12 @@ def fetch_stocks(date):
         if data is None or len(data.index) == 0:
             return None
         if date is None:
-            data.insert(0, 'date', datetime.datetime.now().strftime("%Y-%m-%d"))
+            data.insert(0, 'date', datetime.datetime.now().strftime("%Y-%m-%d"))  ##没制定日期就取当天的时间
         else:
             data.insert(0, 'date', date.strftime("%Y-%m-%d"))
         data.columns = list(tbs.TABLE_CN_STOCK_SPOT['columns'])
-        data = data.loc[data['code'].apply(is_a_stock)].loc[data['new_price'].apply(is_open)]
+        ##app显示有5143支股票，但是过滤后只有4515支
+        data = data.loc[data['code'].apply(is_a_stock)].loc[data['new_price'].apply(is_open)] ##1、上证和深A的股票。2、价格不为nan; 
         return data
     except Exception as e:
         logging.error(f"stockfetch.fetch_stocks处理异常：{e}")
@@ -268,7 +269,7 @@ def fetch_etf_hist(data_base, date_start=None, date_end=None, adjust='qfq'):
     return None
 
 
-# 读取股票历史数据
+# 读取股票历史数据（一只股票过去x年的涨跌数据）
 def fetch_stock_hist(data_base, date_start=None, is_cache=True):
     date = data_base[0]
     code = data_base[1]
@@ -279,7 +280,7 @@ def fetch_stock_hist(data_base, date_start=None, is_cache=True):
     try:
         data = stock_hist_cache(code, date_start, None, is_cache, 'qfq')
         if data is not None:
-            data.loc[:, 'p_change'] = tl.ROC(data['close'].values, 1)
+            data.loc[:, 'p_change'] = tl.ROC(data['close'].values, 1)  ##计算一天的变动率
             data['p_change'].values[np.isnan(data['p_change'].values)] = 0.0
             data["volume"] = data['volume'].values.astype('double') * 100  # 成交量单位从手变成股。
         return data

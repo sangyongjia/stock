@@ -245,7 +245,7 @@ def stock_zh_a_hist(
 ) -> pd.DataFrame:
     """
     东方财富网-行情首页-沪深京 A 股-每日行情
-    https://quote.eastmoney.com/concept/sh603777.html?from=classic
+    
     :param symbol: 股票代码
     :type symbol: str
     :param period: choice of {'daily', 'weekly', 'monthly'}

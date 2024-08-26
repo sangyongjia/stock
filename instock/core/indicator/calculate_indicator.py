@@ -427,7 +427,8 @@ def get_indicator(code_name, data, stock_column, date=None, calc_threshold=90):
             for i in range(columns_num):
                 stock_data_list.append(0)
             return pd.Series(stock_data_list, index=stock_column)
-
+        
+        ##详细指标的计算位置
         idr_data = get_indicators(data, end_date=end_date, threshold=1, calc_threshold=calc_threshold)
 
         # 增加空判断，如果是空返回 0 数据。

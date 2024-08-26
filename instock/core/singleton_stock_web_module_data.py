@@ -194,6 +194,24 @@ class stock_web_module_data(metaclass=singleton_type):
                     order_by=" `cdatetime` DESC"
                 )
             )
+        ## 新增统计数据
+        self.data_list.append(
+            wmd.web_module_data(
+                mode="query",
+                type="股票策略数据",
+                ico="fa fa-check-square-o",
+                name=tbs.TABLE_CN_STOCK_STRATEGIES_STATIC['cn'],
+                table_name=tbs.TABLE_CN_STOCK_STRATEGIES_STATIC['name'],
+                columns=tuple(tbs.TABLE_CN_STOCK_STRATEGIES_STATIC['columns']),
+                column_names=tbs.get_field_cns(tbs.TABLE_CN_STOCK_STRATEGIES_STATIC['columns']),
+                primary_key=[],
+                is_realtime=False,
+                order_columns=f"(SELECT `datetime` FROM `{tbs.TABLE_CN_STOCK_ATTENTION['name']}` WHERE `code`=`{tbs.TABLE_CN_STOCK_STRATEGIES_STATIC['name']}`.`code`) AS `cdatetime`",
+                order_by=" `cdatetime` DESC",)#.set_url(f"/instock/statistics_data?table_name={tbs.TABLE_CN_STOCK_STRATEGIES_STATIC['name']}")
+        )
+
+
+           
         for tmp in self.data_list:
             _data[tmp.table_name] = tmp
         self.data = _data

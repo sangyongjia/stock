@@ -109,11 +109,11 @@ def is_open(now_time):
         return True
     return False
 
-
+##当前时间往前推3年
 def get_trade_hist_interval(date):
     tmp_year, tmp_month, tmp_day = date.split("-")
     date_end = datetime.datetime(int(tmp_year), int(tmp_month), int(tmp_day))
-    date_start = (date_end + datetime.timedelta(days=-(365 * 3))).strftime("%Y%m%d")
+    date_start = (date_end + datetime.timedelta(days=-(365 * 1))).strftime("%Y%m%d") ##3年调整为1年提高运行速度
 
     now_time = datetime.datetime.now()
     now_date = now_time.date()
@@ -124,15 +124,17 @@ def get_trade_hist_interval(date):
                 is_trade_date_open_close_between = True
 
     return date_start, not is_trade_date_open_close_between
-
-
+##eg:今天是2024-8-15
+##9:30前运行：run_date=2024-8-14， run_date_nph=2024-8-14
+##9:30-15:00:run_date=2024-8-14， run_date_nph=2024-8-15
+##15:00以后:run_date=2024-8-15， run_date_nph=2024-8-15
 def get_trade_date_last():
     now_time = datetime.datetime.now()
     run_date = now_time.date()
     run_date_nph = run_date
     if is_trade_date(run_date):
         if not is_close(now_time):
-            run_date = get_previous_trade_date(run_date)
+            run_date = get_previous_trade_date(run_date) ##如果是盘中跑数据，跑的是前一天的数据
             if not is_open(now_time):
                 run_date_nph = run_date
     else:

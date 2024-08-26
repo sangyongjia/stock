@@ -19,7 +19,7 @@ __date__ = '2023/3/10 '
 # 创建新数据库。
 def create_new_database():
     _MYSQL_CONN_DBAPI = mdb.MYSQL_CONN_DBAPI.copy()
-    _MYSQL_CONN_DBAPI['database'] = "mysql"
+    _MYSQL_CONN_DBAPI['database'] = "mysql"  #Q:为啥在这个位置改变数据库的名字？A:先链接默认的mysql，然后在创建自己的db？
     with pymysql.connect(**_MYSQL_CONN_DBAPI) as conn:
         with conn.cursor() as db:
             try:

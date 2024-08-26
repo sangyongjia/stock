@@ -18,7 +18,7 @@ def get_pattern_recognitions(data, stock_column, end_date=None, threshold=120, c
         isCopy = True
     if isCopy:
         data = data.copy()
-
+    ##计算各种k线形态的位置
     for k in stock_column:
         try:
             data.loc[:, k] = stock_column[k]['func'](data['open'].values, data['high'].values, data['low'].values, data['close'].values)
